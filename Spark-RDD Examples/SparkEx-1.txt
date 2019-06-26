@@ -1,0 +1,30 @@
+
+"C:/Users/sashetye/demo/SparkEx-1.txt"
+
+ERROR:You have error in your code
+
+ERROR:Try agian to download MySQL
+
+Please resolved the ERROR4
+
+Now restart your MySQL database
+
+--------------------------------------------------------------------------------------------------------
+
+
+
+scala> val myFile=sc.textFile("C:/Users/sashetye/demo/SparkEx-1.txt")
+myFile: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/SparkEx-1.txt MapPartitionsRDD[7] at textFile at <console>:24
+
+scala> val data=myFile.filter(_.contains("MySQL"))
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[4] at filter at <console>:25
+
+scala> println(data.count())
+2
+
+scala> val errors=myFile.filter(_.startsWith("ERROR"))
+errors: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[8] at filter at <console>:25
+
+scala> errors.foreach(println)
+ERROR:You have error in your code
+ERROR:Try agian to download MYSQL

@@ -1,0 +1,261 @@
+Ex-1]map()
+
+scala> val emp=sc.textFile("C:/Users/sashetye/demo/Employee.csv")
+emp: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Employee.csv MapPartitionsRDD[58] at textFile at <console>:24
+
+scala> val rows=emp.map(line => line.split(","))
+rows: org.apache.spark.rdd.RDD[Array[String]] = MapPartitionsRDD[59] at map at <console>:25
+
+
+or
+import org.apache.spark.SparkContext
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+object  mapTest{
+def main(args: Array[String]) = {
+val spark = SparkSession.builder.appName("mapExample").master("local").getOrCreate()
+val data = spark.read.textFile("spark_test.txt").rdd
+val mapFile = data.map(line => (line,line.length))
+mapFile.foreach(println)
+}
+}
+-----------------------------------------------------------------------------------------------------------
+Ex-2]flatMap()
+
+scala> val data=sc.parallelize(List(1,2,3)).flatMap(x =>List(x,x,x)).collect()
+data: Array[Int] = Array(1, 1, 1, 2, 2, 2, 3, 3, 3)
+
+scala> val data=sc.parallelize(List(1,2,3)).map(x =>List(x,x,x)).collect()
+data: Array[List[Int]] = Array(List(1, 1, 1), List(2, 2, 2), List(3, 3, 3))
+
+or
+
+val data = spark.read.textFile("spark_test.txt").rdd
+val flatmapFile = data.flatMap(lines => lines.split(" "))
+flatmapFile.foreach(println)
+-----------------------------------------------------------------------------------------------------------
+Ex-3]filter()
+
+"C:/Users/sashetye/demo/SparkEx-1.txt"
+
+ERROR:You have error in your code
+
+ERROR:Try agian to download MySQL
+
+Please resolved the ERROR4
+
+Now restart your MySQL database
+
+
+scala> val myFile=sc.textFile("C:/Users/sashetye/demo/SparkEx-1.txt")
+
+scala> val errors=myFile.filter(line => line.contains("ERROR")).foreach(println)
+
+or
+
+val data = spark.read.textFile("spark_test.txt").rdd
+val mapFile = data.flatMap(lines => lines.split(" ")).filter(value => value=="spark")
+println(mapFile.count())
+
+-----------------------------------------------------------------------------------------------------------
+Ex-4]mapPartitions()
+
+scala> val partitions=sc.parallelize(1 to 9,3)
+partitions: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[70] at parallelize at <console>:24
+
+scala> partitions.mapPartitions(x =>List(x.next).iterator).collect()
+res55: Array[Int] = Array(1, 4, 7)
+
+scala> val partitions=sc.parallelize(1 to 9)
+partitions: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[72] at parallelize at <console>:24
+
+scala> partitions.mapPartitions(x =>List(x.next).iterator).collect()
+res56: Array[Int] = Array(1, 2, 3, 4, 5, 6, 7, 8)
+-----------------------------------------------------------------------------------------------------------
+Ex-5]sample()
+scala> val data=sc.parallelize(1 to 10)
+data: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[74] at parallelize at <console>:24
+
+scala> data.sample(true,.2).count()
+res57: Long = 0
+
+scala> data.sample(true,.1).foreach(println)
+2
+-----------------------------------------------------------------------------------------------------------
+Ex-6]union()
+
+scala> val p1=sc.parallelize(1 to 10)
+p1: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[80] at parallelize at <console>:24
+
+scala> val p2=sc.parallelize(1 to 15)
+p2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[81] at parallelize at <console>:24
+
+scala> p1.union(p2).collect()
+res62: Array[Int] = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+
+or
+
+val rdd1 = spark.sparkContext.parallelize(Seq((1,"jan",2016),(3,"nov",2014),(16,"feb",2014)))
+val rdd2 = spark.sparkContext.parallelize(Seq((5,"dec",2014),(17,"sep",2015)))
+val rdd3 = spark.sparkContext.parallelize(Seq((6,"dec",2011),(16,"may",2015)))
+val rddUnion = rdd1.union(rdd2).union(rdd3)
+rddUnion.foreach(Println)
+
+-----------------------------------------------------------------------------------------------------------
+Ex-7]intersection()
+
+scala> val p1=sc.parallelize(1 to 10)
+p1: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[80] at parallelize at <console>:24
+
+scala> val p2=sc.parallelize(1 to 15)
+p2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[81] at parallelize at <console>:24
+
+scala> p1.intersection(p2).collect()
+res63: Array[Int] = Array(8, 1, 9, 10, 2, 3, 4, 5, 6, 7)
+
+or
+
+val rdd1 = spark.sparkContext.parallelize(Seq((1,"jan",2016),(3,"nov",2014, (16,"feb",2014)))
+val rdd2 = spark.sparkContext.parallelize(Seq((5,"dec",2014),(1,"jan",2016)))
+val comman = rdd1.intersection(rdd2)
+comman.foreach(Println)
+-----------------------------------------------------------------------------------------------------------
+Ex-8]distinct()
+
+scala> val p1=sc.parallelize(1 to 9)
+p1: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[89] at parallelize at <console>:24
+
+scala> val p2=sc.parallelize(5 to 15)
+p2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[90] at parallelize at <console>:24
+
+scala> p1.union(p2).distinct.collect()
+res64: Array[Int] = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+
+or
+
+val rdd1 = park.sparkContext.parallelize(Seq((1,"jan",2016),(3,"nov",2014),(16,"feb",2014),(3,"nov",2014)))
+val result = rdd1.distinct()
+println(result.collect().mkString(", "))
+-----------------------------------------------------------------------------------------------------------
+Ex-9]grouByKey()
+
+scala> val emp=sc.textFile("C:/Users/sashetye/demo/Employee.csv")
+emp: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Employee.csv MapPartitionsRDD[1] at textFile at <console>:24
+
+scala> val rows=emp.map(line =>line.split(","))
+rows: org.apache.spark.rdd.RDD[Array[String]] = MapPartitionsRDD[2] at map at <console>:25
+
+                 
+scala> val names=rows.map(name =>(name(1),name(2)))
+names: org.apache.spark.rdd.RDD[(String, String)] = MapPartitionsRDD[3] at map at <console>:25
+
+scala> names.groupByKey.collect()
+res0: Array[(String, Iterable[String])] = Array((Alex,CompactBuffer(Aus, Japan)), (Meena,CompactBuffer(America)), (Sam,CompactBuffer(Africa)), (FirstName,CompactBuffer(Country)), (John,CompactBuffer(Ind)))
+
+scala> names.groupByKey.collect().foreach(println)
+(Alex,CompactBuffer(Aus, Japan))
+(Meena,CompactBuffer(America))
+(Sam,CompactBuffer(Africa))
+(FirstName,CompactBuffer(Country))
+(John,CompactBuffer(Ind))
+
+or
+
+val data = spark.sparkContext.parallelize(Array(('k',5),('s',3),('s',4),('p',7),('p',5),('t',8),('k',6)),3)
+val group = data.groupByKey().collect()
+group.foreach(println)
+-----------------------------------------------------------------------------------------------------------
+Ex-10]reduceByKey()
+
+scala> val emp=sc.textFile("C:/Users/sashetye/demo/Employee.csv")
+emp: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Employee.csv MapPartitionsRDD[7] at textFile at <console>:24
+
+scala> val rows=emp.filter(line => !line.contains("Alex")).map(line =>line.split(","))
+rows: org.apache.spark.rdd.RDD[Array[String]] = MapPartitionsRDD[9] at map at <console>:25
+
+scala> rows.map(n =>(n(1),n(2))).reduceByKey((v1,v2) =>v1+v2).collect.foreach(println)
+(Meena,America)
+(Sam,Africa)
+(FirstName,Country)
+(John,Ind)
+
+or
+
+val words = Array("one","two","two","four","five","six","six","eight","nine","ten")
+val data = spark.sparkContext.parallelize(words).map(w => (w,1)).reduceByKey(_+_)
+data.foreach(println)
+
+-----------------------------------------------------------------------------------------------------------
+Ex-11]sortByKey()
+
+scala> val emp=sc.textFile("C:/Users/sashetye/demo/Employee.csv")
+emp: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Employee.csv MapPartitionsRDD[36] at textFile at <console>:24
+
+scala> val rows=emp.filter(line => !line.contains("Alex")).map(line =>line.split(","))
+rows: org.apache.spark.rdd.RDD[Array[String]] = MapPartitionsRDD[38] at map at <console>:25
+
+scala> rows.map(n =>(n(1),n(2))).sortByKey().foreach(println)
+(FirstName,Country)
+(Meena,America)
+(Sam,Africa)
+(John,Ind)
+
+scala> rows.map(n =>(n(1),n(2))).sortByKey(false).foreach(println)
+(Sam,Africa)
+(Meena,America)
+(John,Ind)
+(FirstName,Country)
+
+or
+
+ val data = spark.sparkContext.parallelize(Seq(("maths",52), ("english",75), ("science",82), ("computer",65), ("maths",85)))
+val sorted = data.sortByKey()
+sorted.foreach(println)
+
+o/p-
+computer,65)
+(english,75)
+(maths,52)
+(maths,85)
+(science,82)
+-----------------------------------------------------------------------------------------------------------
+Ex-12]join()
+
+scala> val names=sc.parallelize(List("abe","abby","apple")).map(a =>(a,1))
+names: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[48] at map at <console>:24
+
+scala> val names2=sc.parallelize(List("apple","beaty","beatrice")).map(a =>(a,1))
+names2: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[50] at map at <console>:24
+
+scala> names.join(names2).collect().foreach(println)
+(apple,(1,1))             
+
+scala> names.leftOuterJoin(names2).collect().foreach(println)
+(abby,(1,None))
+(apple,(1,Some(1)))
+(abe,(1,None))
+
+scala> names.rightOuterJoin(names2).collect().foreach(println)
+(apple,(Some(1),1))
+(beaty,(None,1))
+(beatrice,(None,1))
+
+or 
+
+val data = spark.sparkContext.parallelize(Array(('A',1),('b',2),('c',3)))
+val data2 =spark.sparkContext.parallelize(Array(('A',4),('A',6),('b',7),('c',3),('c',8)))
+val result = data.join(data2)
+println(result.collect().mkString(","))
+
+-----------------------------------------------------------------------------------------------------------
+Ex-13]coalesce()
+val rdd1 = spark.sparkContext.parallelize(Array("jan","feb","mar","april","may","jun"),3)
+val result = rdd1.coalesce(2)
+result.foreach(println)
+
+o/p-
+mar
+april
+may 
+jun
+-----------------------------------------------------------------------------------------------------------

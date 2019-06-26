@@ -1,0 +1,32 @@
+Program for word count-:
+
+C:/Users/sashetye/demo/SparkEx-3.txt
+
+Mango is my fav fruit
+Please bring me Mango kulfi
+Apple desert is ready
+
+-----------------------------------------------------------------------------------
+
+
+scala> val fruits=sc.textFile("C:/Users/sashetye/demo/SparkEx-3.txt")
+fruits: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/SparkEx-3.txt MapPartitionsRDD[16] at textFile at <console>:24
+
+scala> val counts=fruits.flatMap(line => line.split(" "))
+counts: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[17] at flatMap at <console>:25
+
+scala> counts.map(word =>(word,1)).reduceByKey(_+_).foreach(println)
+(ready,1)
+(Please,1)
+(is,2)
+(Mango,2)
+(bring,1)
+(desert,1)
+(fruit,1)
+(kulfi,1)
+(my,1)
+(Apple,1)
+(fav,1)
+(me,1)
+
+scala> counts.saveAsTextFile("C:/Users/sashetye/demo/Output.txt")

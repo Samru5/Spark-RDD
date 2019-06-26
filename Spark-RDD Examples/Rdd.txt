@@ -1,0 +1,199 @@
+1]count,collect-
+
+scala> val file=sc.textFile("C:/Users/sashetye/demo/Errors.txt")
+file: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Errors.txt MapPartitionsRDD[1] at textFile at <console>:24
+
+scala> file.count()
+res0: Long = 3
+
+scala> file.foreach(println)
+Data fetched from MySQL server
+ERROR:Please provide proper code
+Shut down the MySQLERROR server
+
+scala> val line=file.collect()
+line: Array[String] = Array(ERROR:Please provide proper code, Shut down the MySQLERROR server, Data fetched from MySQL server)
+
+scala> for(l <- line)
+     | println(l)
+ERROR:Please provide proper code
+Shut down the MySQLERROR server
+Data fetched from MySQL server
+
+------------------------------------------------------------------------------
+2]union,intersection,subtract,zip-
+
+scala> val data1=sc.textFile("C:/Users/sashetye/demo/Mobile_Data1.csv")
+data1: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Mobile_Data1.csv MapPartitionsRDD[52] at textFile at <console>:24
+
+scala> val data2=sc.textFile("C:/Users/sashetye/demo/Mobile_Data2.csv")
+data2: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Mobile_Data2.csv MapPartitionsRDD[54] at textFile at <console>:24
+
+scala> data1.union(data2).foreach(println)
+orderId,manaufacturing_company,year
+103,NOKIA,2008
+104,SAMSUNG,2016
+103,NOKIA,2008
+orderId,manaufacturing_company,year
+101,NOKIA,2012
+104,SAMSUNG,2016
+105,APPLE,2019
+106,APPLE,2010
+101,SAMSUNG,2012
+105,APPLE,2017
+106,MI,2014
+102,APPLE,2014
+102,MI,2018
+
+scala> data1.intersection(data2).foreach(println)
+orderId,manaufacturing_company,year
+104,SAMSUNG,2016
+103,NOKIA,2008
+
+scala> data1.subtract(data2).foreach(println)
+101,SAMSUNG,2012
+105,APPLE,2019
+106,APPLE,2010
+102,MI,2018
+
+scala> data2.subtract(data1).foreach(println)
+101,NOKIA,2012
+105,APPLE,2017
+102,APPLE,2014
+106,MI,2014
+
+scala> data1.zip(data2).foreach(println)
+(103,NOKIA,2008,103,NOKIA,2008)
+(orderId,manaufacturing_company,year,orderId,manaufacturing_company,year)
+(101,SAMSUNG,2012,101,NOKIA,2012)
+(104,SAMSUNG,2016,104,SAMSUNG,2016)
+(105,APPLE,2019,105,APPLE,2017)
+(102,MI,2018,102,APPLE,2014)
+(106,APPLE,2010,106,MI,2014)
+
+scala> data2.zip(data1).foreach(println)
+(103,NOKIA,2008,103,NOKIA,2008)
+(104,SAMSUNG,2016,104,SAMSUNG,2016)
+(105,APPLE,2017,105,APPLE,2019)
+(orderId,manaufacturing_company,year,orderId,manaufacturing_company,year)
+(101,NOKIA,2012,101,SAMSUNG,2012)
+(106,MI,2014,106,APPLE,2010)
+(102,APPLE,2014,102,MI,2018)
+------------------------------------------------------------------------------
+3]filter,map,take-
+
+scala> val data=sc.textFile("C:/Users/sashetye/demo/User.csv")
+data: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/User.csv MapPartitionsRDD[73] at textFile at <console>:24
+
+
+scala> data.filter(line =>line.contains("jpg")).foreach(println)
+192.168.0.1,1,p1.jpg
+192.168.12.32,3,p3.jpg
+
+scala> data.take(3)
+res25: Array[String] = Array(ip,userId,img, 192.168.0.1,1,p1.jpg, 123.45.8.3,2,p2.png)
+
+scala> data.take(3).foreach(println)
+ip,userId,img
+192.168.0.1,1,p1.jpg
+123.45.8.3,2,p2.png
+
+scala> data.map(line =>line.length).foreach(println)
+22
+13
+22
+20
+19
+                                                       
+scala> data.map(line =>line.split(",").deep).foreach(println)
+Array(ip, userId, img)
+Array(192.168.0.1, 1, p1.jpg)
+Array(123.45.8.3, 2, p2.png)
+Array(192.168.12.32, 3, p3.jpg)
+Array(132.145.32.23, 4, p4.png)
+
+scala> data.map(line =>line.split(",").mkString(" ")).foreach(println)
+ip userId img
+192.168.0.1 1 p1.jpg
+192.168.12.32 3 p3.jpg
+123.45.8.3 2 p2.png
+132.145.32.23 4 p4.png
+
+
+
+scala> data.map(line =>line.split(",").mkString("")).foreach(println)
+192.168.12.323p3.jpg
+ipuserIdimg
+132.145.32.234p4.png
+192.168.0.11p1.jpg
+123.45.8.32p2.png
+
+
+scala> data.map(line =>line.split(",")(0).mkString("")).foreach(println)
+ip
+192.168.12.32
+192.168.0.1
+132.145.32.23
+123.45.8.3
+
+------------------------------------------------------------------------------
+4]reduceByKey,groupByKey-
+
+scala> val data=sc.textFile("C:/Users/sashetye/demo/Ratings.csv")
+data: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Ratings.csv MapPartitionsRDD[88] at textFile at <console>:24
+
+scala> data.map(line =>line.split(",")).map(n=>(n(0),n(1))).countByKey().foreach(println)
+(user1,2)
+(user5,1)
+(user4,1)
+(user2,2)
+(userId,1)
+(user3,1)
+
+scala> data.map(line =>line.split(",")).map(n=>(n(0),n(1))).reduceByKey(_+_).foreach(println)
+(user2,42)
+(user5,3)
+(user4,5)
+(user3,1)
+(user1,54)
+(userId,ratings)
+
+scala> data.map(line =>line.split(",")).map(n=>(n(0),n(1))).reduceByKey(_+_).map(_.swap).foreach(println)
+(42,user2)
+(5,user4)
+(3,user5)
+(1,user3)
+(54,user1)
+(ratings,userId)
+
+scala> data.map(line =>line.split(",")).map(n=>(n(0),n(1))).groupByKey().foreach(println)
+(user5,CompactBuffer(3))
+(user2,CompactBuffer(4, 2))
+(user3,CompactBuffer(1))
+(user4,CompactBuffer(5))
+(user1,CompactBuffer(5, 4))
+(userId,CompactBuffer(ratings))
+
+------------------------------------------------------------------------------
+
+Ex-5]sortByKey-
+
+scala> val data=sc.textFile("C:/Users/sashetye/demo/City.csv")
+data: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/City.csv MapPartitionsRDD[111] at textFile at <console>:24
+
+scala> data.filter(s => !s.equals(header)).map(line =>line.split(",")).map(n =>(n(3),n(4))).sortByKey(false).foreach(println)
+(Smith,Patil)
+(John,Roy)
+(Alex,Singh)
+
+scala> data.filter(s => !s.equals(header)).map(line =>line.split(",")).map(n =>(n(0).toInt,n(4))).sortByKey().foreach(println)
+(123456,Patil)
+(410789,Roy)
+(405203,Singh)
+
+scala> data.filter(s => !s.equals(header)).map(line =>line.split(",")).map(n =>(n(0).toInt,n(4))).sortByKey(false).foreach(println)
+(410789,Roy)
+(405203,Singh)
+(123456,Patil)
+
+

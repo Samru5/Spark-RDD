@@ -1,0 +1,167 @@
+Ex-1]collect()
+
+scala> val list=sc.parallelize(List(1,29,3)).flatMap(x => List(x,x,x))
+list: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[25] at flatMap at <console>:24
+
+scala> list.collect().foreach(println)
+1
+1
+1
+29
+29
+29
+3
+3
+3
+
+or
+
+val data = spark.sparkContext.parallelize(Array(('A',1),('b',2),('c',3)))
+val data2 =spark.sparkContext.parallelize(Array(('A',4),('A',6),('b',7),('c',3),('c',8)))
+val result = data.join(data2)
+println(result.collect().mkString(","))
+---------------------------------------------------------------------------------------------------------------------------
+Ex-2]count()
+
+scala> val names=sc.parallelize(List("John","Alex","Seema","Alexander"))
+names: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[26] at parallelize at <console>:24
+
+scala> println(names.count())
+4
+
+or
+
+val data = spark.read.textFile("spark_test.txt").rdd
+val mapFile = data.flatMap(lines => lines.split(" ")).filter(value => value=="spark")
+println(mapFile.count())
+---------------------------------------------------------------------------------------------------------------------------
+Ex-3]first()
+
+scala> val names=sc.parallelize(List("John","Alex","Seema","Alexander"))
+names: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[27] at parallelize at <console>:24
+
+scala> println(names.first())
+John
+---------------------------------------------------------------------------------------------------------------------------
+Ex-4]take()
+
+scala> val names=sc.parallelize(List("John","Alex","Seema","Alexander"))
+names: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[27] at parallelize at <console>:24
+
+scala> println(names.take(2).deep)
+Array(John, Alex)
+
+or
+
+val data = spark.sparkContext.parallelize(Array(('k',5),('s',3),('s',4),('p',7),('p',5),('t',8),('k',6)),3)
+val group = data.groupByKey().collect()
+val twoRec = result.take(2)
+twoRec.foreach(println)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-5]takeSample()
+
+scala> val names=sc.parallelize(List("John","Alex","Seema","Alexander","Ajay"))
+
+scala> println(names.takeSample(true,4).deep)
+Array(Alex, Alex, Seema, Seema)
+
+scala> println(names.takeSample(false,4).deep)
+Array(John, Alex, Alexander, Seema)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-6]countByKey()
+
+scala> val names=sc.parallelize(List("John","Alex","Seema","Alexander","John","Ajay"))
+names: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[32] at parallelize at <console>:24
+
+scala> names.map(k =>(k,1)).countByKey().foreach(println)
+(John,2)
+(Alexander,1)
+(Alex,1)
+(Seema,1)
+(Ajay,1)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-7]countByKey()
+
+C:/Users/sashetye/demo/Employee.csv
+
+Year,FirstName,Country,Gender
+2016,John,Ind,M
+2018,Alex,Aus,M
+2019,Meena,America,F
+2017,Sam,Africa,M
+2014,Alex,Japan,M
+
+
+scala> val emp=sc.textFile("C:/Users/sashetye/demo/Employee.csv")
+emp: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Employee.csv MapPartitionsRDD[49] at textFile at <console>:24
+
+scala> emp.map(line =>line.split(",")).map(n => (n(1),n(3))).countByKey().foreach(println)
+(John,1)
+(Sam,1)
+(Alex,2)
+(FirstName,1)
+(Meena,1)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-8]reduce()
+
+scala> val names=sc.parallelize(List("John","Alex","Seema","Alexander","Ajay"))
+names: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[54] at parallelize at <console>:24
+
+scala> names.reduce((t1,t2) =>t1+t2)
+res40: String = AjayAlexJohnAlexanderSeema
+
+or
+scala> names.reduce(_ +_).foreach(print)
+AlexanderAlexAjaySeemaJohn
+
+scala> names.flatMap(k =>List(k.size)).foreach(println)
+4
+9
+4
+4
+5
+scala> names.flatMap(k =>List(k.size)).reduce(_+_)
+res50: Int = 26
+
+or
+
+val rdd1 = spark.sparkContext.parallelize(List(20,32,45,62,8,5))
+val sum = rdd1.reduce(_+_)
+println(sum)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-9]saveAsTextFile()
+
+scala> val colours=sc.textFile("C:/Users/sashetye/demo/Colours.txt")
+colours: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Colours.txt MapPartitionsRDD[61] at textFile at <console>:24
+
+scala> colours.saveAsTextFile("result.txt")
+
+---------------------------------------------------------------------------------------------------------------------------
+
+Ex-10]top()
+val data = spark.read.textFile("spark_test.txt").rdd
+val mapFile = data.map(line => (line,line.length))
+val res = mapFile.top(3)
+res.foreach(println)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-11]countByValue()
+
+val data = spark.read.textFile("spark_test.txt").rdd
+val result= data.map(line => (line,line.length)).countByValue()
+result.foreach(println)
+---------------------------------------------------------------------------------------------------------------------------
+
+Ex-12]fold()
+
+val rdd1 = spark.sparkContext.parallelize(List(("maths", 80),("science", 90)))
+val additionalMarks = ("extra", 4)
+val sum = rdd1.fold(additionalMarks){ (acc, marks) => val add = acc._2 + marks._2
+("total", add)
+}
+println(sum)
+---------------------------------------------------------------------------------------------------------------------------
+Ex-13]foreach()
+
+val data = spark.sparkContext.parallelize(Array(('k',5),('s',3),('s',4),('p',7),('p',5),('t',8),('k',6)),3)
+val group = data.groupByKey().collect()
+group.foreach(println)

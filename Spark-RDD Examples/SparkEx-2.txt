@@ -1,0 +1,16 @@
+scala> val a=sc.parallelize(List("A","B","C"),3)
+a: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[5] at parallelize at <console>:24
+
+scala> val b=sc.parallelize(List("X","Y"),2)
+b: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[6] at parallelize at <console>:24
+
+scala> val c=a.cartesian(b)
+c: org.apache.spark.rdd.RDD[(String, String)] = CartesianRDD[7] at cartesian at <console>:27
+
+scala> c.collect().foreach(println)
+(A,X)
+(A,Y)
+(B,X)
+(B,Y)
+(C,X)
+(C,Y)
