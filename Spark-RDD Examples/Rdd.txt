@@ -197,3 +197,52 @@ scala> data.filter(s => !s.equals(header)).map(line =>line.split(",")).map(n =>(
 (123456,Patil)
 
 
+Ex-6]cartesian()-
+scala> val l1=sc.parallelize(List(1,2,3,4,5))
+l1: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[186] at parallelize at <console>:34
+
+scala> val l2=sc.parallelize(List(3,4,5,6,7))
+l2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[187] at parallelize at <console>:34
+
+scala> l1.cartesian(l2).foreach(print)
+(1,3)(1,4)(1,6)(1,5)(1,7)(2,3)(
+
+------------------------------------------------------------------------------
+
+Ex-7]cogroup()-
+
+scala> val myrdd2 = sc.parallelize(List((4,"RealTime"),(5,"Kafka"),(6,"NOSQL"),(1,"stream"),(1,"MLlib")))
+myrdd2: org.apache.spark.rdd.RDD[(Int, String)] = ParallelCollectionRDD[191] at parallelize at <console>:34
+
+scala> val result = myrdd1.cogroup(myrdd2)
+result: org.apache.spark.rdd.RDD[(Int, (Iterable[String], Iterable[String]))] = MapPartitionsRDD[193] at cogroup at <console>:37
+
+
+scala> result.foreach(println)
+(5,(CompactBuffer(),CompactBuffer(Kafka)))
+(4,(CompactBuffer(Flink),CompactBuffer(RealTime)))
+(2,(CompactBuffer(HDFS),CompactBuffer()))
+(3,(CompactBuffer(Hive),CompactBuffer()))
+(1,(CompactBuffer(spark),CompactBuffer(stream, MLlib)))
+(6,(CompactBuffer(HBase),CompactBuffer(NOSQL)))
+------------------------------------------------------------------------------
+Ex-8]repartition()-
+
+scala> val x = (1 to 12).toList
+x: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+
+scala> val numbersDf = x.toDF("number")
+numbersDf: org.apache.spark.sql.DataFrame = [number: int]
+
+scala> numbersDf.rdd.partitions.size
+res68: Int = 8
+
+scala> val numbersDfR = numbersDf.repartition(2)
+numbersDfR: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row] = [number: int]
+
+scala> numbersDfR.rdd.partitions.size
+res69: Int = 2
+
+
+
+
