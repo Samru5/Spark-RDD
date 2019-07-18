@@ -1,0 +1,590 @@
+
+scala> val file=sc.textFile("C:/Users/sashetye/demo/Colours.txt")
+file: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Colours.txt MapPartitionsRDD[9] at textFile at <console>:28
+
+scala> val lines=file.flatMap(l => l.split(" "))
+lines: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[10] at flatMap at <console>:29
+
+scala> lines.count
+res12: Long = 12
+
+scala> val data=lines.filter(_.contains("is"))
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[11] at filter at <console>:29
+
+scala> data.foreach(println)
+is
+is
+
+scala> val data=file.filter(_.contains("is"))
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[12] at filter at <console>:29
+
+scala> data.foreach(println)
+Red is very bright
+Blue is nice
+
+scala> def check(l:String)={l.contains("is")}
+check: (l: String)Boolean
+
+scala> val data=file.filter(check)
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[13] at filter at <console>:31
+
+scala> data.foreach(println)
+Red is very bright
+Blue is nice
+
+
+
+scala> val myFile=sc.textFile("C:/Users/sashetye/demo/Colours.txt")
+myFile: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Colours.txt MapPartitionsRDD[20] at textFile at <console>:28
+
+scala> val data=myFile.flatMap(l =>l.split(" "))
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[21] at flatMap at <console>:29
+
+scala> data.foreach(println)
+Red
+is
+Pink
+dress
+Violet
+very
+shirt
+bright
+Blue
+Blue
+is
+nice
+                                      
+scala> val count=myFile.count
+count: Long = 5
+
+scala> val count=data.count
+count: Long = 12
+
+
+scala> val data=myFile.flatMap(l =>l.split(" ")).map(word=>(word,1)).reduceByKey(_+_)
+data: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[24] at reduceByKey at <console>:29
+
+scala> data.foreach(println)
+(is,2)
+(shirt,1)
+(bright,1)
+(Pink,1)
+(very,1)
+(Violet,1)
+(Blue,2)
+(nice,1)
+(dress,1)
+(Red,1)
+
+
+scala> val numbers=sc.parallelize(1 to 10)
+numbers: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[26] at parallelize at <console>:28
+
+scala> numbers.foreach(println)
+6
+3
+7
+2
+1
+9
+10
+8
+4
+5
+
+scala> val numbers=sc.parallelize(1 until 10)
+numbers: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[27] at parallelize at <console>:28
+
+scala> numbers.foreach(println)
+8
+2
+4
+7
+5
+6
+3
+1
+9
+                         
+
+scala> val numbers=sc.parallelize(1 to 10 by 2)
+numbers: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[28] at parallelize at <console>:28
+
+scala> numbers.foreach(println)
+9
+5
+1
+3
+7
+
+
+scala> val numbers=sc.parallelize(11 until 20)
+numbers: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[31] at parallelize at <console>:28
+
+scala> val data=numbers.map(x => x*x)
+data: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[32] at map at <console>:29
+
+scala> data.foreach(println)
+144
+324
+361
+289
+169
+121
+256
+225
+196
+
+scala> val data=numbers.map(x => x.toString.reverse)
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[33] at map at <console>:29
+
+scala> data.foreach(println)
+21
+51
+81
+91
+71
+61
+11
+41
+31
+
+or
+
+
+scala> val data=numbers.map(_.toString.reverse)
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[34] at map at <console>:29
+
+scala> data.foreach(println)
+81
+11
+31
+41
+21
+61
+51
+71
+91
+
+
+scala> data.first
+res31: String = 11
+
+
+scala> val myFile=sc.textFile("C:/Users/sashetye/demo/Colours.txt")
+myFile: org.apache.spark.rdd.RDD[String] = C:/Users/sashetye/demo/Colours.txt MapPartitionsRDD[37] at textFile at <console>:28
+
+scala> val data=myFile.flatMap(l =>l.split(" "))
+data: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[38] at flatMap at <console>:29
+
+scala> data.collect
+res36: Array[String] = Array(Red, is, very, bright, Blue, is, nice, Pink, dress, Violet, shirt, Blue)
+
+scala> data.foreach(println)
+Red
+is
+very
+bright
+Pink
+dress
+Blue
+is
+nice
+Violet
+shirt
+Blue
+
+scala> data.first
+res38: String = Red
+
+scala> data.collect.mkString(";")
+res39: String = Red;is;very;bright;Blue;is;nice;Pink;dress;Violet;shirt;Blue
+
+
+scala> val list=sc.parallelize(List(23,43,12,4,1))
+list: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[39] at parallelize at <console>:28
+
+scala> list.collect.mkString(";")
+res40: String = 23;43;12;4;1
+
+scala> list.map(_.toInt)
+res41: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[40] at map at <console>:30
+
+scala> list.map(_.toInt).collect
+res42: Array[Int] = Array(23, 43, 12, 4, 1)
+
+
+scala> list.count
+res43: Long = 5
+
+scala> list.distinct
+res44: org.apache.spark.rdd.RDD[Int] = MapPartitionsRDD[44] at distinct at <console>:30
+
+scala>
+
+scala> list.distinct.foreach(println)
+1
+4
+12
+43
+23
+
+
+scala> list.sample(false,0.5).collect
+res63: Array[Int] = Array(43, 12)
+
+scala> list.sample(false,0.8).collect
+res64: Array[Int] = Array(23, 12, 4, 1)
+
+scala> list.sample(false,0.9).collect
+res65: Array[Int] = Array(23, 43, 12, 4, 1)
+
+scala> list.sample(false,1).collect
+res66: Array[Int] = Array(23, 43, 12, 4, 1)
+
+scala> list.sample(true,1).collect
+res67: Array[Int] = Array(23, 23, 43)
+
+scala> list.sample(true,4).collect
+res68: Array[Int] = Array(23, 23, 23, 43, 43, 43, 43, 43, 12, 12, 12, 12, 4, 4, 4, 1, 1, 1, 1, 1)
+
+scala> list.sample(true,2).collect
+res69: Array[Int] = Array(43, 43, 43, 43, 43, 12, 4, 4, 4, 1, 1)
+
+scala> val num=sc.parallelize(List(30,10,20))
+num: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[68] at parallelize at <console>:28
+
+scala> num.sum
+res70: Double = 60.0
+
+scala> num.mean
+res71: Double = 20.0
+
+scala> num.min
+res72: Int = 10
+
+scala> num.max
+res73: Int = 30
+
+scala> num.stdev
+res76: Double = 8.16496580927726
+
+scala> num.variance
+res77: Double = 66.66666666666667
+
+
+scala> val num=sc.parallelize(Array(15, 16, 20, 20, 77, 80, 94, 94, 98, 16, 31, 31,15,20))
+num: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[76] at parallelize at <console>:28
+
+scala> num.histogram(Array(1.0, 50.0, 100.0)))
+<console>:1: error: ';' expected but ')' found.
+num.histogram(Array(1.0, 50.0, 100.0)))
+                                      ^
+
+scala> num.histogram(Array(1.0, 50.0, 100.0))
+res78: Array[Long] = Array(9, 5)
+
+scala> num.histogram(3)
+res79: (Array[Double], Array[Long]) = (Array(15.0, 42.66666666666667, 70.33333333333334, 98.0),Array(9, 0, 5))
+
+scala> val num=sc.parallelize(Array(10,20,30))
+num: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[82] at parallelize at <console>:28
+
+scala> num.histogram(Array(1.0, 50.0, 100.0))
+res80: Array[Long] = Array(3, 0)
+
+scala> num.histogram(3)
+res81: (Array[Double], Array[Long]) = (Array(10.0, 16.666666666666668, 23.333333333333336, 30.0),Array(1, 1, 1))
+
+
+scala> val list = List.fill(50)(scala.util.Random.nextInt(10))
+list: List[Int] = List(6, 0, 2, 1, 4, 2, 0, 6, 4, 2, 3, 7, 5, 8, 4, 3, 3, 9, 4, 0, 6, 4, 8, 4, 5, 1, 4, 4, 0, 0, 4, 4, 7, 3, 5, 4, 4, 2, 6, 3, 8, 7, 5, 7, 5, 5, 1, 1, 0, 7)
+
+scala> val rdd = sc.parallelize(list, 5).glom()
+rdd: org.apache.spark.rdd.RDD[Array[Int]] = MapPartitionsRDD[116] at glom at <console>:30
+
+scala> rdd.collect
+res93: Array[Array[Int]] = Array(Array(6, 0, 2, 1, 4, 2, 0, 6, 4, 2), Array(3, 7, 5, 8, 4, 3, 3, 9, 4, 0), Array(6, 4, 8, 4, 5, 1, 4, 4, 0, 0), Array(4, 4, 7, 3, 5, 4, 4, 2, 6, 3), Array(8, 7, 5, 7, 5, 5, 1, 1, 0, 7))
+
+scala>
+
+scala> val rdd = sc.parallelize(list, 4).glom()
+rdd: org.apache.spark.rdd.RDD[Array[Int]] = MapPartitionsRDD[118] at glom at <console>:30
+
+scala> rdd.collect
+res94: Array[Array[Int]] = Array(Array(6, 0, 2, 1, 4, 2, 0, 6, 4, 2, 3, 7), Array(5, 8, 4, 3, 3, 9, 4, 0, 6, 4, 8, 4, 5), Array(1, 4, 4, 0, 0, 4, 4, 7, 3, 5, 4, 4), Array(2, 6, 3, 8, 7, 5, 7, 5, 5, 1, 1, 0, 7))
+
+scala> rdd.count
+res95: Long = 4
+
+res95: Long = 4
+
+scala> val rdd1 = sc.parallelize(List(7,8,9))
+rdd1: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[119] at parallelize at <console>:28
+
+scala> val rdd2 = sc.parallelize(List(1,2,3))
+rdd2: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[120] at parallelize at <console>:28
+
+scala> rdd1.cartesian(rdd2).collect()
+res96: Array[(Int, Int)] = Array((7,1), (7,2), (7,3), (8,1), (8,2), (8,3), (9,1), (9,2), (9,3))
+
+scala> rdd1.cartesian(rdd2).filter(el => el._1 % el._2 == 0).collect()
+res97: Array[(Int, Int)] = Array((7,1), (8,1), (8,2), (9,1), (9,3))
+
+scala> val rdd1 = sc.parallelize(List(1,2,3))
+rdd1: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[124] at parallelize at <console>:28
+
+scala> val rdd2 = sc.parallelize(List("n4","n5","n6"))
+rdd2: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[125] at parallelize at <console>:28
+
+scala> rdd1.zip(rdd2).collect()
+res98: Array[(Int, String)] = Array((1,n4), (2,n5), (3,n6))
+
+
+scala> rdd1.zipPartitions(rdd2, true)((iter1, iter2) => {
+     | iter1.zipAll(iter2, -1, "empty")
+     | .map({case(x1, x2)=>x1+"-"+x2})
+     | }).collect()
+res101: Array[String] = Array(1-empty, 2-n1, 3-n2, 4-n3, 5-n4, 6-empty, 7-n5, 8-n6, 9-n7, 10-n8)
+
+scala> val list = List.fill(50)(scala.util.Random.nextInt(10))
+list: List[Int] = List(4, 7, 9, 3, 4, 1, 1, 0, 8, 1, 7, 4, 1, 7, 9, 0, 5, 9, 2, 5, 5, 3, 1, 4, 8, 8, 5, 0, 3, 0, 8, 5, 0, 8, 9, 7, 3, 5, 2, 5, 0, 3, 8, 0, 2, 6, 6, 0, 4, 1)
+
+scala> list.size
+res103: Int = 50
+
+scala> val listrdd = sc.parallelize(list, 5)
+listrdd: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[130] at parallelize at <console>:30
+
+scala> listrdd.collect
+res104: Array[Int] = Array(4, 7, 9, 3, 4, 1, 1, 0, 8, 1, 7, 4, 1, 7, 9, 0, 5, 9, 2, 5, 5, 3, 1, 4, 8, 8, 5, 0, 3, 0, 8, 5, 0, 8, 9, 7, 3, 5, 2, 5, 0, 3, 8, 0, 2, 6, 6, 0, 4, 1)
+
+scala> val pairs = listrdd.map(x => (x, x*x))
+pairs: org.apache.spark.rdd.RDD[(Int, Int)] = MapPartitionsRDD[131] at map at <console>:29
+
+scala> pairs.collect
+res105: Array[(Int, Int)] = Array((4,16), (7,49), (9,81), (3,9), (4,16), (1,1), (1,1), (0,0), (8,64), (1,1), (7,49), (4,16), (1,1), (7,49), (9,81), (0,0), (5,25), (9,81), (2,4), (5,25), (5,25), (3,9), (1,1), (4,16), (8,64), (8,64), (5,25), (0,0), (3,9), (0,0), (8,64), (5,25), (0,0), (8,64), (9,81), (7,49), (3,9), (5,25), (2,4), (5,25), (0,0), (3,9), (8,64), (0,0), (2,4), (6,36), (6,36), (0,0), (4,16), (1,1))
+
+scala> val reduced = pairs.reduceByKey((v1, v2)=>v1+v2)
+reduced: org.apache.spark.rdd.RDD[(Int, Int)] = ShuffledRDD[132] at reduceByKey at <console>:29
+
+scala> reduced.collect
+res106: Array[(Int, Int)] = Array((0,0), (5,175), (1,6), (6,72), (7,196), (2,12), (3,45), (8,384), (4,80), (9,324))
+
+scala> val finalrdd = reduced.mapPartitions(
+     | iter => iter.map({case(k,v)=>"K="+k+",V="+v}))
+finalrdd: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[133] at mapPartitions at <console>:29
+
+scala> finalrdd.collect
+res107: Array[String] = Array(K=0,V=0, K=5,V=175, K=1,V=6, K=6,V=72, K=7,V=196, K=2,V=12, K=3,V=45, K=8,V=384, K=4,V=80, K=9,V=324)
+
+scala> println(finalrdd.toDebugString)
+(5) MapPartitionsRDD[133] at mapPartitions at <console>:29 []
+ |  ShuffledRDD[132] at reduceByKey at <console>:29 []
+ +-(5) MapPartitionsRDD[131] at map at <console>:29 []
+    |  ParallelCollectionRDD[130] at parallelize at <console>:30 []
+
+
+scala> val list=sc.parallelize(List(10,20,30))
+list: org.apache.spark.rdd.RDD[Int] = ParallelCollectionRDD[135] at parallelize at <console>:28
+
+
+scala> val d=list.toDF("marks")
+d: org.apache.spark.sql.DataFrame = [marks: int]
+
+scala> d.show
++-----+
+|marks|
++-----+
+|   10|
+|   20|
+|   30|
++-----+
+
+scala> d.select(max("marks")).show
++----------+
+|max(marks)|
++----------+
+|        30|
++----------+
+
+
+scala> d.select(min("marks")).show
++----------+
+|min(marks)|
++----------+
+|        10|
++----------+
+
+
+scala> d.select(avg("marks")).show
++----------+
+|avg(marks)|
++----------+
+|      20.0|
++----------+
+
+//Eg
+scala> val words = Array("one", "two", "two", "three", "three", "three")
+words: Array[String] = Array(one, two, two, three, three, three)
+
+scala> val wordPairsRDD = sc.parallelize(words).map(word => (word, 1))
+wordPairsRDD: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[56] at map at <console>:29
+
+scala> word
+wordPairsRDD   words
+
+scala> wordPairsRDD.foreach(println)
+(three,1)
+(one,1)
+(three,1)
+(three,1)
+(two,1)
+(two,1)
+
+scala> val wordCountsWithReduce = wordPairsRDD
+wordCountsWithReduce: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[56] at map at <console>:29
+
+scala> val wordCountsWithReduce = wordPairsRDD.reduceByKey(_+_).collect
+wordCountsWithReduce: Array[(String, Int)] = Array((two,2), (one,1), (three,3))
+
+scala> val wordCountsWithGroup = wordPairsRDD  .groupByKey()
+wordCountsWithGroup: org.apache.spark.rdd.RDD[(String, Iterable[Int])] = ShuffledRDD[58] at groupByKey at <console>:28
+
+scala> wordCountsWithGroup.foreach(println)
+(one,CompactBuffer(1))
+(two,CompactBuffer(1, 1))
+(three,CompactBuffer(1, 1, 1))
+
+scala> val wordCountsWithGroup = wordPairsRDD  .groupByKey().map(t => (t._1, t._2.sum))
+wordCountsWithGroup: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[60] at map at <console>:28
+
+scala> wordCountsWithGroup.foreach(println)
+(two,2)
+(one,1)
+(three,3)
+
+//Eg
+
+scala> val file2=spark.read.json("C:/Users/sashetye/demo/Employee1.json")
+file2: org.apache.spark.sql.DataFrame = [name: string, salary: bigint]
+
+scala> file2.show
++-------+------+
+|   name|salary|
++-------+------+
+|Michael|  3000|
+|   Andy|  4500|
+| Justin|  3500|
+|  Berta|  4000|
+|   Raju|  3000|
+| Chandy|  4500|
+|   Joey|  3500|
+|    Mon|  4000|
+| Rachel|  4000|
++-------+------+
+
+
+scala> val file2=spark.read.json("C:/Users/sashetye/demo/Employee1.json").toJavaRDD
+file2: org.apache.spark.api.java.JavaRDD[org.apache.spark.sql.Row] = MapPartitionsRDD[74] at toJavaRDD at <console>:26
+
+
+scala> file2.collect
+res42: java.util.List[org.apache.spark.sql.Row] = [[Michael,3000], [Andy,4500], [Justin,3500], [Berta,4000], [Raju,3000], [Chandy,4500], [Joey,3500], [Mon,4000], [Rachel,4000]]
+
+//Eg:-aggregateByKey()
+
+scala> val data=sc.parallelize(Seq("John=10","seema=20","John=5","seema=30","sita=5"))
+data: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[75] at parallelize at <console>:27
+
+scala> val pair=data.map(x => x.split("=")).map(x=>(x(0),x(1)))
+pair: org.apache.spark.rdd.RDD[(String, String)] = MapPartitionsRDD[77] at map at <console>:28
+
+scala> val initial=0
+initial: Int = 0
+
+
+scala> val addOp=(sum:Int,new_value:String) => sum+new_value.toInt
+addOp: (Int, String) => Int = <function2>
+
+scala> val mergeOp=(p1:Int,p2:Int)=>p1+p2
+mergeOp: (Int, Int) => Int = <function2>
+
+
+scala> val out=pair.aggregateByKey(initial)(addOp,mergeOp)
+out: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[78] at aggregateByKey at <console>:34
+
+scala> out.collect
+res43: Array[(String, Int)] = Array((John,15), (sita,5), (seema,50))
+
+//Eg-combineByKey()
+
+scala> val data=sc.parallelize(Seq("John=10","seema=20","John=5","seema=30","sita=5","John=10"),3)
+data: org.apache.spark.rdd.RDD[String] = ParallelCollectionRDD[79] at parallelize at <console>:27
+
+scala> val init_comb=(score:Double) =>(1,score)
+init_comb: Double => (Int, Double) = <function1>
+                                                                                
+scala> val part_combiner=(part:(Int,Double),score:Double)=>{(part._1 + 1,part._2+score)}
+part_combiner: ((Int, Double), Double) => (Int, Double) = <function2>
+
+scala> val part_Merger=(part1:(Int,Double),part2:(Int,Double)) =>{(part1._1+part2._1,part1._2+part2._2)}
+part_Merger: ((Int, Double), (Int, Double)) => (Int, Double) = <function2>
+
+scala> val pair=data.map(x => x.split("=")).map(x=>(x(0),x(1).toDouble))
+pair: org.apache.spark.rdd.RDD[(String, Double)] = MapPartitionsRDD[81] at map at <console>:28
+
+scala> val out=pair.combineByKey(init_comb,part_combiner,part_Merger)
+out: org.apache.spark.rdd.RDD[(String, (Int, Double))] = ShuffledRDD[82] at combineByKey at <console>:34
+
+scala> out.collect
+res44: Array[(String, (Int, Double))] = Array((John,(3,25.0)), (seema,(2,50.0)), (sita,(1,5.0)))
+
+scala> out.map(x =>( x._1,x._2._2/x._2._1)).collect
+res47: Array[(String, Double)] = Array((John,8.333333333333334), (seema,25.0), (sita,5.0))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
